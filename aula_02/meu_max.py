@@ -3,6 +3,14 @@ from time import time
 
 
 def meu_max(iteravel):
+    """
+    Análise do algorítmo
+    Tempo de execução, algorítmo O(n)
+    Em memório O(1)
+    :param iteravel:
+    :return:
+
+    """
     numero_maximo = -inf
     for numero in iteravel:
         if numero > numero_maximo:
