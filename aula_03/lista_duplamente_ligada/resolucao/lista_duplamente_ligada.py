@@ -12,6 +12,15 @@ class Noh():
         self.esquerdo = esquerdo
         self.direito = direito
 
+    def adicionar_a_direita(self, noh: 'Noh') -> 'Noh':
+        self.direito = noh
+        noh.esquerdo = self
+        return noh
+
+    def adicionar_a_esquerda(self, noh:'Noh'):
+        noh.adicionar_a_direita(self)
+        return noh
+
 
 class ListaDuplamenteLigada():
     def __init__(self) -> None:
@@ -31,12 +40,9 @@ class ListaDuplamenteLigada():
         self.tam += 1
         noh = Noh(valor)
         if self.primeiro is None:
-            self.primeiro = noh
-            self.ultimo = noh
+            self.ultimo = self.primeiro = noh
         else:
-            noh.esquerdo = self.ultimo
-            self.ultimo.direito = noh
-            self.ultimo = noh
+            self.ultimo = self.ultimo.adicionar_a_direita(noh)
 
     def adicionar_a_esquerda(self, valor):
         '''
@@ -46,12 +52,9 @@ class ListaDuplamenteLigada():
         self.tam += 1
         noh = Noh(valor)
         if self.primeiro is None:
-            self.primeiro = noh
-            self.ultimo = noh
+            self.ultimo = self.primeiro = noh
         else:
-            noh.direito = self.primeiro
-            self.primeiro.esquerdo = noh
-            self.primeiro = noh
+            self.primeiro = self.primeiro.adicionar_a_esquerda(noh)
 
     def remover(self):
         '''
