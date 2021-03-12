@@ -30,8 +30,7 @@ class Noh():
     def desfazer_ligacoes(self):
         direito = self.direito
         esquerdo = self.esquerdo
-        direito.esquerdo=esquerdo.direito=self.direito = self.esquerdo = noh_none
-
+        direito.esquerdo = esquerdo.direito = self.direito = self.esquerdo = noh_none
 
     def remover_a_esquerda(self):
         self.esquerdo.direito = noh_none
