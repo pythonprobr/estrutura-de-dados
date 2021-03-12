@@ -1,29 +1,30 @@
 import unittest
 
-from aula_03.lista_duplamente_ligada.resolucao.lista_duplamente_ligada import Noh, ListaDuplamenteLigada, ListaVaziaErro
+from aula_03.lista_duplamente_ligada.resolucao.lista_duplamente_ligada import Noh, ListaDuplamenteLigada, \
+    ListaVaziaErro, noh_none
 
 
 class NohTestes(unittest.TestCase):
     def test_init_com_valores_padrao(self):
         noh = Noh(4)
         self.assertEqual(4, noh.valor)
-        self.assertIsNone(noh.esquerdo)
-        self.assertIsNone(noh.direito)
+        self.assertIs(noh_none, noh.esquerdo)
+        self.assertIs(noh_none, noh.direito)
 
     def test_init_com_no_esquerdo(self):
         esquerdo = Noh(1)
         noh = Noh(2, esquerdo)
         self.assertEqual(esquerdo, noh.esquerdo)
-        self.assertIsNone(noh.direito)
+        self.assertIs(noh_none, noh.direito)
         noh3 = Noh(3, esquerdo=esquerdo)
         self.assertEqual(esquerdo, noh3.esquerdo)
-        self.assertIsNone(noh3.direito)
+        self.assertIs(noh_none, noh3.direito)
 
     def test_init_com_no_direito(self):
         direito = Noh(1)
         noh = Noh(2, direito=direito)
         self.assertEqual(direito, noh.direito)
-        self.assertIsNone(noh.esquerdo)
+        self.assertIs(noh_none, noh.esquerdo)
 
     def test_init_com_no_esquerdo_e_direito(self):
         esquerdo = Noh(1)
@@ -37,8 +38,8 @@ class ListaTestes(unittest.TestCase):
     def test_init(self):
         lista = ListaDuplamenteLigada()
         self.assertEquals(0, lista.tam)
-        self.assertIsNone(lista.primeiro)
-        self.assertIsNone(lista.ultimo)
+        self.assertIs(noh_none, lista.primeiro)
+        self.assertIs(noh_none, lista.ultimo)
 
     def test_adicionar_primeiro(self):
         lista = ListaDuplamenteLigada()
@@ -47,8 +48,8 @@ class ListaTestes(unittest.TestCase):
         primeiro = lista.primeiro
         self.assertEqual(0, primeiro.valor)
         self.assertEqual(primeiro, lista.ultimo)
-        self.assertIsNone(primeiro.esquerdo)
-        self.assertIsNone(primeiro.direito)
+        self.assertIs(noh_none, primeiro.esquerdo)
+        self.assertIs(noh_none, primeiro.direito)
 
     def test_adicionar_segundo(self):
         lista = ListaDuplamenteLigada()
@@ -61,8 +62,8 @@ class ListaTestes(unittest.TestCase):
         self.assertEqual(1, ultimo.valor)
         self.assertEqual(primeiro, ultimo.esquerdo)
         self.assertEqual(ultimo, primeiro.direito)
-        self.assertIsNone(primeiro.esquerdo)
-        self.assertIsNone(ultimo.direito)
+        self.assertIs(noh_none, primeiro.esquerdo)
+        self.assertIs(noh_none, ultimo.direito)
 
     def test_adicionar_terceiro(self):
         lista = ListaDuplamenteLigada()
@@ -82,8 +83,8 @@ class ListaTestes(unittest.TestCase):
         self.assertEqual(segundo, ultimo.esquerdo)
         self.assertEqual(ultimo, segundo.direito)
 
-        self.assertIsNone(primeiro.esquerdo)
-        self.assertIsNone(ultimo.direito)
+        self.assertIs(noh_none, primeiro.esquerdo)
+        self.assertIs(noh_none, ultimo.direito)
 
     def test_adicionar_primeiro_a_esquerda(self):
         lista = ListaDuplamenteLigada()
@@ -92,8 +93,8 @@ class ListaTestes(unittest.TestCase):
         primeiro = lista.primeiro
         self.assertEqual(0, primeiro.valor)
         self.assertEqual(primeiro, lista.ultimo)
-        self.assertIsNone(primeiro.esquerdo)
-        self.assertIsNone(primeiro.direito)
+        self.assertIs(noh_none, primeiro.esquerdo)
+        self.assertIs(noh_none, primeiro.direito)
 
     def test_adicionar_segundo_a_esquerda(self):
         lista = ListaDuplamenteLigada()
@@ -106,8 +107,8 @@ class ListaTestes(unittest.TestCase):
         self.assertEqual(0, ultimo.valor)
         self.assertEqual(primeiro, ultimo.esquerdo)
         self.assertEqual(ultimo, primeiro.direito)
-        self.assertIsNone(primeiro.esquerdo)
-        self.assertIsNone(ultimo.direito)
+        self.assertIs(noh_none, primeiro.esquerdo)
+        self.assertIs(noh_none, ultimo.direito)
 
     def test_adicionar_terceiro(self):
         lista = ListaDuplamenteLigada()
@@ -127,8 +128,8 @@ class ListaTestes(unittest.TestCase):
         self.assertEqual(segundo, ultimo.esquerdo)
         self.assertEqual(ultimo, segundo.direito)
 
-        self.assertIsNone(primeiro.esquerdo)
-        self.assertIsNone(ultimo.direito)
+        self.assertIs(noh_none, primeiro.esquerdo)
+        self.assertIs(noh_none, ultimo.direito)
 
     def test_remover_lista_vazia(self):
         lista = ListaDuplamenteLigada()
@@ -139,8 +140,8 @@ class ListaTestes(unittest.TestCase):
         lista.adicionar(0)
         self.assertEqual(0, lista.remover())
         self.assertEqual(0, lista.tam)
-        self.assertIsNone(lista.primeiro)
-        self.assertIsNone(lista.ultimo)
+        self.assertIs(noh_none, lista.primeiro)
+        self.assertIs(noh_none, lista.ultimo)
 
     def test_remover_lista_2_elementos(self):
         lista = ListaDuplamenteLigada()
@@ -151,8 +152,8 @@ class ListaTestes(unittest.TestCase):
         primeiro = lista.primeiro
         self.assertEqual(primeiro, lista.ultimo)
         self.assertEqual(0, primeiro.valor)
-        self.assertIsNone(primeiro.direito)
-        self.assertIsNone(primeiro.esquerdo)
+        self.assertIs(noh_none, primeiro.direito)
+        self.assertIs(noh_none, primeiro.esquerdo)
 
     def test_remover_lista_3_elementos(self):
         lista = ListaDuplamenteLigada()
@@ -167,8 +168,8 @@ class ListaTestes(unittest.TestCase):
         self.assertEqual(primeiro, ultimo.esquerdo)
         self.assertEqual(0, primeiro.valor)
         self.assertEqual(1, ultimo.valor)
-        self.assertIsNone(primeiro.esquerdo)
-        self.assertIsNone(ultimo.direito)
+        self.assertIs(noh_none, primeiro.esquerdo)
+        self.assertIs(noh_none, ultimo.direito)
 
     def test_remover_a_esquerda_lista_vazia(self):
         lista = ListaDuplamenteLigada()
@@ -179,8 +180,8 @@ class ListaTestes(unittest.TestCase):
         lista.adicionar(0)
         self.assertEqual(0, lista.remover_a_esquerda())
         self.assertEqual(0, lista.tam)
-        self.assertIsNone(lista.primeiro)
-        self.assertIsNone(lista.ultimo)
+        self.assertIs(noh_none, lista.primeiro)
+        self.assertIs(noh_none, lista.ultimo)
 
     def test_remover_a_esquerda_lista_2_elementos(self):
         lista = ListaDuplamenteLigada()
@@ -191,8 +192,8 @@ class ListaTestes(unittest.TestCase):
         primeiro = lista.primeiro
         self.assertEqual(primeiro, lista.ultimo)
         self.assertEqual(1, primeiro.valor)
-        self.assertIsNone(primeiro.direito)
-        self.assertIsNone(primeiro.esquerdo)
+        self.assertIs(noh_none, primeiro.direito)
+        self.assertIs(noh_none, primeiro.esquerdo)
 
     def test_remover_a_esquerda_lista_3_elementos(self):
         lista = ListaDuplamenteLigada()
@@ -207,8 +208,8 @@ class ListaTestes(unittest.TestCase):
         self.assertEqual(primeiro, ultimo.esquerdo)
         self.assertEqual(1, primeiro.valor)
         self.assertEqual(2, ultimo.valor)
-        self.assertIsNone(primeiro.esquerdo)
-        self.assertIsNone(ultimo.direito)
+        self.assertIs(noh_none, primeiro.esquerdo)
+        self.assertIs(noh_none, ultimo.direito)
 
     def test_iterar_lista_vazia(self):
         lista = ListaDuplamenteLigada()

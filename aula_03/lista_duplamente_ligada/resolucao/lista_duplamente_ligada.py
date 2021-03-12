@@ -9,17 +9,72 @@ class Noh():
         Complexidade de Espaço: f(n) = 3 -> O(1)
         '''
         self.valor = valor
-        self.esquerdo = esquerdo
-        self.direito = direito
+        self.esquerdo = noh_none if esquerdo is None else esquerdo
+        self.direito = noh_none if direito is None else direito
 
     def adicionar_a_direita(self, noh: 'Noh') -> 'Noh':
         self.direito = noh
         noh.esquerdo = self
         return noh
 
-    def adicionar_a_esquerda(self, noh:'Noh'):
+    def adicionar_a_esquerda(self, noh: 'Noh'):
         noh.adicionar_a_direita(self)
         return noh
+
+    def __iter__(self):
+        noh = self
+        while noh is not noh_none:
+            yield noh
+            noh = noh.direito
+
+    def desfazer_ligacoes(self):
+        direito = self.direito
+        esquerdo = self.esquerdo
+        direito.esquerdo=esquerdo.direito=self.direito = self.esquerdo = noh_none
+
+
+    def remover_a_esquerda(self):
+        self.esquerdo.direito = noh_none
+        self.esquerdo = noh_none
+        return self
+
+    def calcular_primeiro(self, noh):
+        return self
+
+    def calcular_ultimo(self, noh):
+        return self
+
+    def calcular_primeiro_antes_da_remocao(self, ultimo_noh):
+        if ultimo_noh is self:
+            return noh_none
+        return self
+
+
+class _NohNoneObject(Noh):
+    def __init__(self) -> None:
+        '''
+        Complexidade de Tempo:  f(n) = 3 -> O(1)
+        Complexidade de Espaço: f(n) = 3 -> O(1)
+        '''
+        # self.esquerdo = esquerdo
+        # self.direito = direito
+
+    def calcular_primeiro(self, noh):
+        return noh
+
+    def calcular_ultimo(self, noh):
+        return noh
+
+    def desfazer_ligacoes(self):
+        raise ImpossivelDesfazerLigacacoNohNone()
+
+
+
+noh_none = _NohNoneObject()
+
+
+class ImpossivelDesfazerLigacacoNohNone(Exception):
+    pass
 
 
 class ListaDuplamenteLigada():
@@ -29,8 +84,8 @@ class ListaDuplamenteLigada():
         Complexidade de Espaço: f(n) = 3 -> O(1)
         '''
         self.tam = 0
-        self.primeiro = None
-        self.ultimo = None
+        self.primeiro = noh_none
+        self.ultimo = noh_none
 
     def adicionar(self, valor):
         '''
@@ -39,10 +94,8 @@ class ListaDuplamenteLigada():
         '''
         self.tam += 1
         noh = Noh(valor)
-        if self.primeiro is None:
-            self.ultimo = self.primeiro = noh
-        else:
-            self.ultimo = self.ultimo.adicionar_a_direita(noh)
+        self.primeiro = self.primeiro.calcular_primeiro(noh)
+        self.ultimo = self.ultimo.adicionar_a_direita(noh)
 
     def adicionar_a_esquerda(self, valor):
         '''
@@ -51,26 +104,22 @@ class ListaDuplamenteLigada():
         '''
         self.tam += 1
         noh = Noh(valor)
-        if self.primeiro is None:
-            self.ultimo = self.primeiro = noh
-        else:
-            self.primeiro = self.primeiro.adicionar_a_esquerda(noh)
+        self.ultimo = self.ultimo.calcular_ultimo(noh)
+        self.primeiro = self.primeiro.adicionar_a_esquerda(noh)
 
     def remover(self):
         '''
         Complexidade de Tempo:  f(n) = 8 -> O(1)
         Complexidade de Espaço: f(n) = 1 -> O(1)
         '''
-        if self.primeiro is None:
-            raise ListaVaziaErro('Não existem elementos na lista')
-        elif self.ultimo is self.primeiro:
-            noh = self.primeiro
-            self.primeiro = None
-            self.ultimo = None
-        else:
-            noh = self.ultimo
-            self.ultimo = noh.esquerdo
-            self.ultimo.direito = None
+
+        noh = self.ultimo
+        self.ultimo = noh.esquerdo
+        self.primeiro = self.primeiro.calcular_primeiro_antes_da_remocao(noh)
+        try:
+            noh.desfazer_ligacoes()
+        except ImpossivelDesfazerLigacacoNohNone as e:
+            raise ListaVaziaErro('Não existem elementos na lista') from e
         self.tam -= 1
         return noh.valor
 
@@ -79,16 +128,15 @@ class ListaDuplamenteLigada():
         Complexidade de Tempo:  f(n) = 8 -> O(1)
         Complexidade de Espaço: f(n) = 1 -> O(1)
         '''
-        if self.primeiro is None:
+        if self.primeiro is noh_none:
             raise ListaVaziaErro('Não existem elementos na lista')
         elif self.ultimo is self.primeiro:
             noh = self.primeiro
-            self.primeiro = None
-            self.ultimo = None
+            self.primeiro = noh_none
+            self.ultimo = noh_none
         else:
             noh = self.primeiro
-            self.primeiro = noh.direito
-            self.primeiro.esquerdo = None
+            self.primeiro = self.primeiro.direito.remover_a_esquerda()
         self.tam -= 1
         return noh.valor
 
@@ -97,7 +145,7 @@ class ListaDuplamenteLigada():
         Complexidade de Tempo:  f(n) = 3n + 1 -> O(n)
         Complexidade de Espaço: f(n) = 1 -> O(1)
         '''
-        noh = self.primeiro
-        while noh is not None:
+
+        for noh in self.primeiro:
             yield noh.valor
-            noh = noh.direito
+
