@@ -6,6 +6,9 @@ class Pilha:
     def __init__(self):
         self._deque = deque()
 
+    def __repr__(self):
+        return repr(self._deque)
+
     @property
     def esta_vazia(self):
         return len(self._deque) == 0

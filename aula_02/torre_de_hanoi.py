@@ -1,7 +1,7 @@
 contagem_de_chamadas_recursivas = 0
 
 
-def _torre_de_hanoi_recursivo(numero_de_discos, origem, destino, auxiliar):
+def _torre_de_hanoi_recursivo(numero_de_discos, origem, destino, auxiliar) -> object:
     """
     f(n) = 1 + 2 * f(n-1)
     f(n) = 1 + 2 * (1 + 2 * f(n-2)) -> 1 + 2 + 4*f(n-2)
@@ -37,7 +37,7 @@ def torre_de_hanoi(numero_de_discos: int):
 
 
 if __name__ == '__main__':
-    for i in range(1, 20):
+    for i in range(1, 4):
         print(f'##### Hanoi para {i} discos')
         torre_de_hanoi(i)
         print(f'********* {contagem_de_chamadas_recursivas} chamadas')
