@@ -9,6 +9,9 @@ class Pilha:
     def __repr__(self):
         return repr(self._deque)
 
+    def __len__(self):
+        return len(self._deque)
+
     @property
     def esta_vazia(self):
         return len(self._deque) == 0

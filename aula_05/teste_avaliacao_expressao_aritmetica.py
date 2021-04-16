@@ -1,9 +1,13 @@
 # Exercício de avaliação de expressão aritmética.
 # Só podem ser usadas as estruturas Pilha e Fila implementadas em aulas anteriores.
 # Deve ser análise de tempo e espaço para função avaliação
+import operator
+import string
 import unittest
+from itertools import chain
 from numbers import Number
 
+from aula_04.pilha_com_lista_duplamente_ligada import Pilha
 from aula_05.fila import Fila
 
 
@@ -15,17 +19,43 @@ class ErroSintatico(Exception):
     pass
 
 
-def analise_lexica(expressao:str) -> Fila:
+caracteres_de_abertura = frozenset('{[(')
+caracteres_de_fechamento = frozenset(']})')
+operacoes = {'+': operator.add, '-': operator.sub, '/': operator.truediv, '*': operator.mul}
+caracteres_de_abertura_ou_fechamento = frozenset(chain(caracteres_de_abertura, caracteres_de_fechamento))
+
+caracteres_nao_numericos = frozenset(chain(caracteres_de_abertura_ou_fechamento, operacoes.keys()))
+caracteres_validos = frozenset(
+    chain(caracteres_nao_numericos, '.', *string.digits))
+
+
+def analise_lexica(expressao: str) -> Fila:
     """
     Executa análise lexica transformando a expressao em fila de objetos:
     e verificar se demais caracteres são validos: +-*/(){}[]
     :param expressao: string com expressao a ser analisada
     :return: fila com tokens
     """
-    pass
+    token = Fila()
+    fila_de_tokens = Fila()
+    for letra in expressao:
+        if letra not in caracteres_validos:
+            raise ErroLexico()
+
+        if letra.isnumeric():
+            token.enfileirar(letra)
+        else:
+            if not token.esta_vazia():
+                fila_de_tokens.enfileirar(''.join(token))
+                token = Fila()
+            fila_de_tokens.enfileirar(letra)
+    if not token.esta_vazia():
+        fila_de_tokens.enfileirar(''.join(token))
+
+    return fila_de_tokens
 
 
-def analise_sintatica(fila:Fila) -> Fila:
+def analise_sintatica(fila: Fila) -> Fila:
     """
     Função que realiza analise sintática de tokens produzidos por analise léxica.
     Executa validações sintáticas e se não houver erro retorn fila_sintatica para avaliacao
@@ -35,19 +65,74 @@ def analise_sintatica(fila:Fila) -> Fila:
     :param fila: fila proveniente de análise lexica
     :return: fila_sintatica com elementos tokens de numeros
     """
-    pass
+    if fila.esta_vazia():
+        raise ErroSintatico()
+    fila_de_valores_sintaticos = Fila()
+    possivel_numero = Fila()
+    for token in fila:
+        if token in caracteres_nao_numericos:
+            if len(possivel_numero) == 1 and token != '.':
+                fila_de_valores_sintaticos.enfileirar(int(possivel_numero.desenfileirar()))
+            elif len(possivel_numero) == 3:
+                numero_str = ''.join(possivel_numero)
+                fila_de_valores_sintaticos.enfileirar(float(numero_str))
+                possivel_numero = Fila()
+            fila_de_valores_sintaticos.enfileirar(token)
+        else:
+            possivel_numero.enfileirar(token)
+
+    if len(possivel_numero) == 1:
+        fila_de_valores_sintaticos.enfileirar(int(possivel_numero.desenfileirar()))
+    elif len(possivel_numero) == 3:
+        numero_str = ''.join(possivel_numero)
+        fila_de_valores_sintaticos.enfileirar(float(numero_str))
+    return fila_de_valores_sintaticos
 
 
-def avaliar(expressao:str) -> Number:
+def avaliar(expressao: str) -> Number:
     """
     Função que avalia expressão aritmetica retornando seu valor se não houver nenhum erro
     :param expressao: string com expressão aritmética
     :return: valor númerico com resultado
     """
     # Fazer análise léxica
+    fila_lexica = analise_lexica(expressao)
     # Fazer análise sintática
+    fila_sintatica = analise_sintatica(fila_lexica)
     # Processar os tokens gerados
-    pass
+    pilha_de_tokens = Pilha()
+    pilha_de_tokens.empilhar(fila_sintatica.desenfileirar())
+    if fila_sintatica.esta_vazia():
+        return pilha_de_tokens.desempilhar()
+    pilha_de_tokens.empilhar(fila_sintatica.desenfileirar())
+    # 2 + 1
+    for token in fila_sintatica:
+        if token in caracteres_de_fechamento:
+            numero = pilha_de_tokens.desempilhar()
+            pilha_de_tokens.desempilhar()  # Caracter de abertura
+            pilha_de_tokens.empilhar(numero)
+        else:
+            pilha_de_tokens.empilhar(token)
+        calcular_operacoes_matematicas(pilha_de_tokens)
+
+    return pilha_de_tokens.desempilhar()
+
+
+def calcular_operacoes_matematicas(pilha_de_tokens):
+    while len(pilha_de_tokens) > 2:
+        segundo_operando = pilha_de_tokens.desempilhar()
+        operacao = pilha_de_tokens.desempilhar()
+        primeiro_operando = pilha_de_tokens.desempilhar()
+        try:
+            funcao_de_operacao = operacoes[operacao]
+            resultado = funcao_de_operacao(primeiro_operando, segundo_operando)
+        except (KeyError, TypeError):
+            pilha_de_tokens.empilhar(primeiro_operando)
+            pilha_de_tokens.empilhar(operacao)
+            pilha_de_tokens.empilhar(segundo_operando)
+            break
+        else:
+            pilha_de_tokens.empilhar(resultado)
 
 
 class AnaliseLexicaTestes(unittest.TestCase):
@@ -193,7 +278,7 @@ class AvaliacaoTestes(unittest.TestCase):
         self.assert_avaliacao('(2-1)')
 
     def test_expressao_com_todos_elementos(self):
-        self.assertEqual(1.0, avaliar('2.0/[4*3+1-{15-(1+3)}]'))
+        self.assertEqual(1.0, avaliar('2.0/[4*3+1-{15-(1+3)}]'))  # 2.0
 
     def assert_avaliacao(self, expressao):
         self.assertEqual(eval(expressao), avaliar(expressao))
