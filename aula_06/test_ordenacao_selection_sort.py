@@ -2,12 +2,18 @@ import unittest
 
 
 def selection_sort(seq):
-    ordenada = []
-    for _ in list(seq):
-        valor_minimo = min(seq)
-        ordenada.append(valor_minimo)
-        seq.remove(valor_minimo)
-    return ordenada
+    for indice_atual, _ in enumerate(seq):
+        indice_do_valor_minimo = min(
+            (valor, indice) for indice, valor in
+            enumerate(gerar_slice_sem_gastar_memoria(indice_atual, seq), start=indice_atual)
+        )[1]
+        seq[indice_atual], seq[indice_do_valor_minimo] = seq[indice_do_valor_minimo], seq[indice_atual]
+    return seq
+
+
+def gerar_slice_sem_gastar_memoria(indice_atual, seq):
+    for indice in range(indice_atual, len(seq)):
+        yield seq[indice]
 
 
 class OrdenacaoTestes(unittest.TestCase):
