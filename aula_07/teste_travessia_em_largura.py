@@ -1,9 +1,52 @@
+from collections import deque
+
+
 class Noh:
-    pass
+    def __init__(self, valor, pai=None) -> None:
+        self.valor = valor
+        self.pai = pai
+        self._filhos = deque()
+
+        if pai is not None:
+            pai._filhos.append(self)
+
+    @property
+    def filhos(self):
+        return list(self._filhos)
+
+    def adicionar(self, filho):
+        self._filhos.append(filho)
+        filho.pai = self
 
 
 class Arvore:
-    pass
+    def __init__(self, raiz=None) -> None:
+        self.raiz = raiz
+
+    def altura(self):
+        if not self.raiz:
+            return 0
+
+        nivel = self.raiz._filhos
+        altura = 1
+        while nivel:
+            altura += 1
+            filhos = []
+            for item in nivel:
+                filhos.extend(item.filhos)
+            nivel = filhos
+
+        return altura
+
+    def __iter__(self):
+        if not self.raiz:
+            return StopIteration
+
+        items = deque([self.raiz])
+        while items:
+            atual = items.popleft()
+            yield atual.valor
+            items.extend(atual.filhos)
 
 
 from unittest.case import TestCase
