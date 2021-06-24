@@ -1,3 +1,4 @@
+from unittest.case import TestCase
 from collections import deque
 
 
@@ -8,7 +9,7 @@ class Noh:
         self._filhos = deque()
 
         if pai is not None:
-            pai._filhos.append(self)
+            pai.adicionar(self)
 
     @property
     def filhos(self):
@@ -47,9 +48,6 @@ class Arvore:
             atual = items.popleft()
             yield atual.valor
             items.extend(atual.filhos)
-
-
-from unittest.case import TestCase
 
 
 class NohTestes(TestCase):
