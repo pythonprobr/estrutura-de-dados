@@ -1,19 +1,36 @@
+from collections import Counter
+from typing import Union, Iterator
 from unittest import TestCase
 
 
 def calcular_frequencias(s):
-    pass
+    return Counter(s)
 
 
 def gerar_arvore_de_huffman(s):
-    pass
+    frequencias = calcular_frequencias(s)
+    arvores = [Arvore(char, peso) for char, peso in frequencias.items()]
+    while len(arvores) > 1:
+        arvores.sort(key=lambda arvore: arvore.raiz.peso, reverse=True)
+        arvore_com_menor_frequencia = arvores.pop()
+        arvore_com_segunda_menor_frequencia = arvores.pop()
+        arvore_fundida = arvore_com_segunda_menor_frequencia.fundir(arvore_com_menor_frequencia)
+        arvores.append(arvore_fundida)
+    return arvores[0]
 
 
-def codificar(cod_dict, s):
-    pass
+def codificar(cod_dict:dict, s:str):
+    for char in s:
+        yield cod_dict[char]
+
 
 
 class Noh:
+    def __init__(self, peso: int):
+        self.peso = peso
+        self.esquerdo = None
+        self.direito = None
+
     def __hash__(self):
         return hash(self.peso)
 
@@ -24,6 +41,10 @@ class Noh:
 
 
 class Folha():
+    def __init__(self, char: str, peso: int):
+        self.peso = peso
+        self.char = char
+
     def __hash__(self):
         return hash(self.__dict__)
 
@@ -33,7 +54,25 @@ class Folha():
         return self.__dict__ == other.__dict__
 
 
+def gerar_dicionario_de_codificao(noh: Union[Noh, Folha], resultado: dict, caminho: str):
+    if isinstance(noh, Folha):
+        resultado[noh.char] = caminho
+    else:
+        caminho_a_esquerda = caminho + '0'
+        gerar_dicionario_de_codificao(noh.esquerdo, resultado, caminho_a_esquerda)
+        caminho_a_direita = caminho + '1'
+        gerar_dicionario_de_codificao(noh.direito, resultado, caminho_a_direita)
+
+    return resultado
+
+
 class Arvore(object):
+    def __init__(self, char: str = None, peso: int = None):
+        if char is None and peso is None:
+            self.raiz = None
+        else:
+            self.raiz = Folha(char, peso)
+
     def __hash__(self):
         return hash(self.raiz)
 
@@ -41,6 +80,35 @@ class Arvore(object):
         if other is None:
             return False
         return self.raiz == other.raiz
+
+    def fundir(self, outra_arvore: 'Arvore'):
+        noh = Noh(self.raiz.peso + outra_arvore.raiz.peso)
+        noh.esquerdo = self.raiz
+        noh.direito = outra_arvore.raiz
+        arvore = Arvore()
+        arvore.raiz = noh
+        return arvore
+
+    def cod_dict(self):
+        return gerar_dicionario_de_codificao(self.raiz, {}, '')
+
+    def decodificar(self, texto_codificado: str):
+        return ''.join(decodificar(self.raiz, self.raiz, iter(texto_codificado)))
+
+
+def decodificar(raiz: Union[Noh, Folha], noh: Union[Noh, Folha], iterator: Iterator[str]):
+    if isinstance(noh, Folha):
+        yield noh.char
+        yield from decodificar(raiz, raiz, iterator)
+    try:
+        binario = next(iterator)
+    except StopIteration:
+        pass
+    else:
+        if binario == '0':
+            yield from decodificar(raiz, noh.esquerdo, iterator)
+        elif binario == '1':
+            yield from decodificar(raiz, noh.direito, iterator)
 
 
 class CalcularFrequenciaCarecteresTestes(TestCase):
@@ -139,5 +207,5 @@ class TestesDeIntegracao(TestCase):
 
     def teste_codificar(self):
         arvore = gerar_arvore_de_huffman('aaaabbc')
-        self.assertEqual('0000101011', codificar(arvore.cod_dict(), 'aaaabbc'))
+        self.assertEqual('0000101011', ''.join(codificar(arvore.cod_dict(), 'aaaabbc')))
         self.assertEqual('aaaabbc', arvore.decodificar('0000101011'))
