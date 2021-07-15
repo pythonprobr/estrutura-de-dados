@@ -1,3 +1,6 @@
+import unittest
+
+
 class Arco():
     def __init__(self, origem, destino, valor):
         self.valor = valor
@@ -11,9 +14,6 @@ class Arco():
 
     def __repr__(self):
         return 'Arco({!r}, {!r}, {!r})'.format(self.vertices[0], self.vertices[1], self.valor)
-
-
-import unittest
 
 
 class ArcoTestes(unittest.TestCase):
@@ -40,17 +40,19 @@ sjc = 'São José dos Campos'
 sao_paulo = 'São Paulo'
 taubate = 'Taubaté'
 
-vertices_cidades = (bertioga,
-                    caragua,
-                    jacarei,
-                    mogi,
-                    santos,
-                    sjc,
-                    sao_paulo,
-                    taubate)
+vertices_cidades = (
+    bertioga,
+    caragua,
+    jacarei,
+    mogi,
+    santos,
+    sjc,
+    sao_paulo,
+    taubate
+)
 # Dados de arcos
 arco_tauba_sjc = Arco(taubate, sjc, 43900)
-arco_scj_jaca = Arco(sjc, jacarei, 13200)
+arco_sjc_jaca = Arco(sjc, jacarei, 13200)
 arco_scj_caragua = Arco(sjc, caragua, 86900)
 arco_caragua_bertioga = Arco(caragua, bertioga, 114000)
 arco_bertioga_mogi = Arco(bertioga, mogi, 48700)
@@ -60,16 +62,18 @@ arco_jaca_sp = Arco(jacarei, sao_paulo, 81800)
 arco_santos_sp = Arco(santos, sao_paulo, 72800)
 arco_santos_bertioga = Arco(santos, bertioga, 74400)
 
-arcos_distancias = (arco_tauba_sjc,
-                    arco_scj_jaca,
-                    arco_scj_caragua,
-                    arco_caragua_bertioga,
-                    arco_bertioga_mogi,
-                    arco_mogi_jaca,
-                    arco_mogi_sp,
-                    arco_jaca_sp,
-                    arco_santos_sp,
-                    arco_santos_bertioga)
+arcos_distancias = (
+    arco_tauba_sjc,
+    arco_sjc_jaca,
+    arco_scj_caragua,
+    arco_caragua_bertioga,
+    arco_bertioga_mogi,
+    arco_mogi_jaca,
+    arco_mogi_sp,
+    arco_jaca_sp,
+    arco_santos_sp,
+    arco_santos_bertioga
+)
 
 
 class GrafoTestes(unittest.TestCase):
@@ -94,14 +98,14 @@ class GrafoTestes(unittest.TestCase):
         self.assert_mesmo_elementos(tuple(), grafo.arcos(jacarei))
         self.assert_mesmo_elementos(tuple(), grafo.adjacencias(sjc))
         self.assert_mesmo_elementos(tuple(), grafo.adjacencias(jacarei))
-        grafo.adicionar_arco(arco_scj_jaca)
-        self.assert_mesmo_elementos((arco_scj_jaca,), grafo.arcos(jacarei))
-        self.assert_mesmo_elementos((arco_scj_jaca,), grafo.arcos(sjc))
+        grafo.adicionar_arco(arco_sjc_jaca)
+        self.assert_mesmo_elementos((arco_sjc_jaca,), grafo.arcos(jacarei))
+        self.assert_mesmo_elementos((arco_sjc_jaca,), grafo.arcos(sjc))
         self.assert_mesmo_elementos((jacarei,), grafo.adjacencias(sjc))
         self.assert_mesmo_elementos((sjc,), grafo.adjacencias(jacarei))
         grafo.adicionar_vertice(taubate)
         grafo.adicionar_arco(arco_tauba_sjc)
-        self.assert_mesmo_elementos((arco_scj_jaca, arco_tauba_sjc), grafo.arcos(sjc))
+        self.assert_mesmo_elementos((arco_sjc_jaca, arco_tauba_sjc), grafo.arcos(sjc))
         self.assert_mesmo_elementos((arco_tauba_sjc,), grafo.arcos(taubate))
 
         self.assert_mesmo_elementos((sjc,), grafo.adjacencias(jacarei))
@@ -123,7 +127,7 @@ class GrafoTestes(unittest.TestCase):
         grafo = Grafo()
         grafo.adicionar_vertice(sjc)
         grafo.adicionar_vertice(jacarei)
-        grafo.adicionar_arco(arco_scj_jaca)
+        grafo.adicionar_arco(arco_sjc_jaca)
         self.assertListEqual([sjc, jacarei], grafo.caminho(sjc, jacarei))
 
     def teste_caminho_tres_vertices_conexos(self):
@@ -131,7 +135,7 @@ class GrafoTestes(unittest.TestCase):
         grafo.adicionar_vertice(sjc)
         grafo.adicionar_vertice(jacarei)
         grafo.adicionar_vertice(taubate)
-        grafo.adicionar_arco(arco_scj_jaca)
+        grafo.adicionar_arco(arco_sjc_jaca)
         grafo.adicionar_arco(arco_tauba_sjc)
 
         self.assertListEqual([taubate, sjc, jacarei], grafo.caminho(taubate, jacarei))
@@ -143,7 +147,7 @@ class GrafoTestes(unittest.TestCase):
         grafo.adicionar_vertice(jacarei)
         grafo.adicionar_vertice(mogi)
         grafo.adicionar_vertice(sao_paulo)
-        grafo.adicionar_arco(arco_scj_jaca)
+        grafo.adicionar_arco(arco_sjc_jaca)
         grafo.adicionar_arco(arco_jaca_sp)
         grafo.adicionar_arco(arco_mogi_jaca)
         grafo.adicionar_arco(arco_mogi_sp)
