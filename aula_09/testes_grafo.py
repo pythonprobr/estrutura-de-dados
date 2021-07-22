@@ -1,8 +1,10 @@
 import unittest
+from numbers import Number
+from typing import Dict, List, Tuple
 
 
 class Arco():
-    def __init__(self, origem, destino, valor):
+    def __init__(self, origem: str, destino: str, valor: Number):
         self.valor = valor
         self.vertices = (origem, destino)
 
@@ -14,6 +16,12 @@ class Arco():
 
     def __repr__(self):
         return 'Arco({!r}, {!r}, {!r})'.format(self.vertices[0], self.vertices[1], self.valor)
+
+    def oposto(self, vertice: str):
+        if vertice == self.vertices[0]:
+            return self.vertices[1]
+        elif vertice == self.vertices[1]:
+            return self.vertices[0]
 
 
 class ArcoTestes(unittest.TestCase):
@@ -74,6 +82,58 @@ arcos_distancias = (
     arco_santos_sp,
     arco_santos_bertioga
 )
+
+
+class Grafo:
+
+    def __init__(self):
+        self._vertices: Dict[str, Dict[str, List[Arco]]] = dict()
+
+    def vertices(self):
+        return tuple(self._vertices)
+
+    def adicionar_vertice(self, vertice: str):
+        self._vertices[vertice] = self._vertices.get(vertice, dict())
+
+    def arcos(self, vertice: str):
+        lista_de_arcos = []
+        for lista_de_arcos_vertice_oposto in self._vertices[vertice].values():
+            lista_de_arcos.extend(lista_de_arcos_vertice_oposto)
+
+        return tuple(lista_de_arcos)
+
+    def adjacencias(self, vertice: str):
+        return tuple(self._vertices[vertice].keys())
+
+    def adicionar_arco(self, arco: Arco):
+        for vertice in arco.vertices:
+            self.adicionar_vertice(vertice)
+            dict_adjacencias: Dict[str, List[Arco]] = self._vertices[vertice]
+            vertice_oposto: str = arco.oposto(vertice)
+            lista_de_arcos: List[Arco] = dict_adjacencias.get(vertice_oposto, list())
+            lista_de_arcos.append(arco)
+            dict_adjacencias[vertice_oposto] = lista_de_arcos
+
+    def caminho(self, vertice_origem: str, vertice_destino: str) -> List[str]:
+        if vertice_destino == vertice_origem:
+            return [vertice_origem]
+        vertices_visitados = {vertice_origem}
+        arcos = []
+        arcos.extend(self.arcos(vertice_origem))
+        caminho = [vertice_origem]
+        while arcos:
+            arco = arcos.pop()
+            vertice_oposto = arco.oposto(vertice_origem)
+            if vertice_oposto == vertice_destino:
+                caminho.append(vertice_destino)
+                return caminho
+
+            if vertice_oposto not in vertices_visitados:
+                vertice_origem = vertice_oposto
+                vertices_visitados.add(vertice_origem)
+                caminho.append(vertice_origem)
+                arcos.extend(self.arcos(vertice_origem))
+        return []
 
 
 class GrafoTestes(unittest.TestCase):
