@@ -4,13 +4,23 @@ from itertools import product
 regra = {'2': 'abc', '3': 'def', '4': 'ghi', '5': 'jkl', '6': 'mno', '7': 'pqrs', '8': 'tuv', '9': 'wzyz'}
 
 
-def gerar_alfa(s):
+def gerar_alfa(s: str):
     """
     Fazer análise de tempo e espaço
     Função recebe string com números de 2 a 9 e responde todas sequencias possíveis de letras
     Reg
     """
-    pass
+    yield from _gerar_alfa_rec(s, len(s) - 1)
+
+
+def _gerar_alfa_rec(s, cursor):
+    if cursor == -1:
+        yield tuple()
+        return
+
+    for solucao_parcial_tpl in _gerar_alfa_rec(s, cursor - 1):
+        for proxima_letra in regra[s[cursor]]:
+            yield solucao_parcial_tpl + (proxima_letra,)
 
 
 class Testes(unittest.TestCase):
